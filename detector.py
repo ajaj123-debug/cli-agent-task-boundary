@@ -269,17 +269,17 @@ def classify_boundary(prompts: list[UserPrompt], lookback: int = 5) -> BoundaryS
     if new_score >= 2 and new_score > cont_score:
         decision = "new_task"
         confidence = min(0.95, 0.4 + 0.2 * new_score)
-        rec = (f"⚡ TASK BOUNDARY — wykryto sygnały nowego tasku ({new_score} matches). "
-               f"Rozważ /compact lub nową sesję — bieżąca historia może być balastem.")
+        rec = (f"TASK BOUNDARY - wykryto sygnaly nowego tasku ({new_score} matches). "
+               f"Rozwaz /compact lub nowa sesje - biezaca historia moze byc balastem.")
     elif complete_score >= 2 and complete_score > cont_score:
         decision = "task_complete"
         confidence = min(0.9, 0.3 + 0.2 * complete_score)
-        rec = (f"⚠️ TASK COMPLETE — poprzedni task wygląda na zakończony ({complete_score} matches). "
-               f"Jeśli zaczynasz nowy task → /compact lub nowa sesja.")
+        rec = (f"TASK COMPLETE - poprzedni task wyglada na zakonczony ({complete_score} matches). "
+               f"Jesli zaczynasz nowy task -> /compact lub nowa sesja.")
     elif cont_score > new_score + complete_score:
         decision = "continuation"
         confidence = min(0.85, 0.3 + 0.15 * cont_score)
-        rec = f"✅ KONTYNUACJA — historia relewantna ({cont_score} matches). Brak akcji wymagany."
+        rec = f"KONTYNUACJA - historia relewantna ({cont_score} matches). Brak akcji wymagany."
     else:
         decision = "unclear"
         confidence = 0.3

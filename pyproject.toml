@@ -45,4 +45,7 @@ py-modules = [
   "settings_dialog",
   "token_economy",
 ]
-packages = ["server"]
+packages = ["server", "dashboard"]
+
+[tool.setuptools.package-data]
+dashboard = ["*.html", "*.css", "*.js"]

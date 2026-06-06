@@ -31,15 +31,15 @@ from adapters import ADAPTERS, get_prompts, normalize_source
 
 
 COLOR_MAP = {
-    "new_task":       ("\033[33m", "⚡"),   # yellow
-    "task_complete":  ("\033[36m", "⚠️"),   # cyan
-    "continuation":   ("\033[32m", "✅"),   # green
-    "unclear":        ("\033[37m", "•"),    # grey
+    "new_task":       ("\033[33m", "[!]"),  # yellow
+    "task_complete":  ("\033[36m", "[i]"),  # cyan
+    "continuation":   ("\033[32m", "[OK]"), # green
+    "unclear":        ("\033[37m", "[-]"),  # grey
 }
 RESET = "\033[0m"
 
 
-def analyze(session_path: Path, lookback: int, source: str = "claude_code") -> dict:
+def analyze(session_path: Path | None, lookback: int, source: str = "claude_code") -> dict:
     if source == "claude_code" and session_path and session_path.suffix == ".jsonl":
         events = read_session(session_path)
         prompts = extract_user_prompts(events)
@@ -48,7 +48,7 @@ def analyze(session_path: Path, lookback: int, source: str = "claude_code") -> d
     boundary = classify_boundary(prompts, lookback=lookback)
     cvs = context_value_score(prompts)
     return {
-        "session": str(session_path),
+        "session": str(session_path) if session_path else source,
         "n_user_prompts": len(prompts),
         "context_tokens_estimate": sum(p.tokens for p in prompts),
         "context_value_score": round(cvs, 3),
@@ -77,7 +77,7 @@ def render(result: dict, color: bool = True) -> str:
 
     lines = [
         f"{col}{icon} {decision.upper()}{RESET_}  (confidence: {b['confidence']:.0%})",
-        f"   Sesja: {Path(result['session']).name}",
+        f"   Sesja: {Path(result['session']).name if result['session'] else result['session']}",
         f"   Historia: {result['n_user_prompts']} user prompts, ~{result['context_tokens_estimate']:,} tokens",
         f"   Context value: {result['context_value_score']:.0%}",
         f"   Sygnały: new={b['scores']['new_task']} complete={b['scores']['task_complete']} cont={b['scores']['continuation']}",
@@ -86,14 +86,14 @@ def render(result: dict, color: bool = True) -> str:
     return "\n".join(lines)
 
 
-def watch(session_path: Path, lookback: int, json_out: bool, color: bool,
+def watch(session_path: Path | None, lookback: int, json_out: bool, color: bool,
           source: str = "claude_code") -> None:
     last_mtime = 0
     last_decision = None
     print(f"Watching: {session_path} (source={source})", file=sys.stderr)
     while True:
         try:
-            mtime = session_path.stat().st_mtime
+            mtime = session_path.stat().st_mtime if session_path else time.time()
             if mtime > last_mtime:
                 last_mtime = mtime
                 result = analyze(session_path, lookback, source=source)
@@ -102,7 +102,7 @@ def watch(session_path: Path, lookback: int, json_out: bool, color: bool,
                 if decision != last_decision or decision in ("new_task", "task_complete"):
                     last_decision = decision
                     if json_out:
-                        print(json.dumps(result, ensure_ascii=False))
+                        print(json.dumps(result, ensure_ascii=True))
                     else:
                         print("\n" + render(result, color=color))
                     sys.stdout.flush()
@@ -148,7 +148,7 @@ def main() -> int:
 
     result = analyze(session_path, args.lookback, source=source)
     if args.json:
-        print(json.dumps(result, ensure_ascii=False, indent=2))
+        print(json.dumps(result, ensure_ascii=True, indent=2))
     else:
         print(render(result, color=not args.no_color))
     return 0
