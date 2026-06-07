@@ -89,7 +89,7 @@ def _api_headers() -> dict:
     return {
         "Authorization": f"Bearer {key}",
         "Content-Type": "application/json",
-        "HTTP-Referer": "https://github.com/claude-task-boundary",
+        "HTTP-Referer": "https://github.com/rafalwronapl/cli-agent-task-boundary",
         "X-Title": "Task Boundary Detector",
     }
 

@@ -1,10 +1,34 @@
-# Claude Task Boundary Detector
+# CLI Agent Task Boundary Detector
+
+[![CI](https://github.com/rafalwronapl/cli-agent-task-boundary/actions/workflows/ci.yml/badge.svg)](https://github.com/rafalwronapl/cli-agent-task-boundary/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Python 3.11+](https://img.shields.io/badge/Python-3.11%2B-blue.svg)](pyproject.toml)
 
 Local task-boundary detection for Claude Code, OpenAI Codex CLI, and Gemini CLI
 sessions, with an optional FinOps dashboard for anonymous team metrics.
 
 The core question is simple: did the current assistant session drift into a new
 task, so it is time to compact, reset, or start a fresh session?
+
+The project is positioned as a multi-CLI agent-session boundary detector for
+Claude Code, OpenAI Codex CLI, Gemini CLI, and similar local assistant tools.
+
+## Why This Matters
+
+Long assistant sessions drift: the user asks a new question, the context still
+contains old assumptions, and cost/context metrics become hard to reason about.
+For teams using CLI agents, the practical need is a local signal for when a
+session should be compacted, reset, or reported as complete.
+
+This project keeps that signal privacy-aware by default. Team dashboards receive
+anonymous numeric metrics, while prompt text and file paths stay local.
+
+## Demo
+
+The FinOps dashboard below is shown with generated demo metrics. Real reporter
+uploads use anonymous numeric session data only.
+
+![Task Boundary FinOps dashboard demo](docs/screenshots/finops-dashboard-demo.png)
 
 ## What It Does
 
@@ -214,7 +238,7 @@ Current test coverage checks:
 ## Files
 
 ```text
-claude-task-boundary/
+cli-agent-task-boundary/
 |-- detector.py                  # Layer 1 regex classifier and JSONL parsing
 |-- embeddings_detector.py       # Layer 2 semantic drift
 |-- llm_detector.py              # Layer 3 OpenRouter/Ollama verdicts

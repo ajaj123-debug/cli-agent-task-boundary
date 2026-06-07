@@ -3,7 +3,7 @@ requires = ["setuptools>=69"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "claude-task-boundary"
+name = "cli-agent-task-boundary"
 version = "0.1.0"
 description = "Local task-boundary detection and anonymous FinOps metrics for CLI assistant sessions."
 readme = "README.md"
